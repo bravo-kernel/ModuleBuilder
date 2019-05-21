@@ -1,0 +1,36 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+# Should? probably run both Core and Windows
+# readable steps
+# entry level/understandable
+# well commented
+
+
+trigger:
+- master
+
+variables:
+  ArtifactName: Modules
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+
+- powershell: |
+    Install-Module -Name ModuleBuilder -Force -Verbose -Scope CurrentUser
+    Install-Module -Name Configuration -Force -Verbose -Scope CurrentUser
+  displayName: 'Install required Powershell Modules'
+
+- powershell: ./build.ps1 -Verbose
+  displayName: 'Build a fresh module using build script'
+
+- powershell: |
+    Import-Module ./Output/0.0.1/{{ModuleName}}.psd1 -Force -Verbose
+  displayName: 'Import and test the freshly generated Module'
+
+# - powershell: Get-{{ModuleName}}Command
+#   displayName: 'Run a Command from the new Powershell Module'
